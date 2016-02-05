@@ -64,7 +64,8 @@ public class MacAddressAndIpFinder {
 		System.out.println("Ip: " + GetAddress("ip"));
 		System.out.println("Mac: " + GetAddress("mac"));
 		System.out.println("================================================================");
-		System.out.println(getAllNetworkData());
+		System.out.println("Get all network data:"+ getAllNetworkData());
+		System.out.println("Computer name:" + getComputerName());
 
 	}
 	
@@ -272,6 +273,23 @@ public class MacAddressAndIpFinder {
 		}
 
 		return address;
+	}
+	
+	public static String getComputerName()
+	{
+		String hostname = null;
+		try
+		{
+		    InetAddress addr;
+		    addr = InetAddress.getLocalHost();
+		    hostname = addr.getHostName();
+		}
+		catch (UnknownHostException ex)
+		{
+		    System.out.println("Hostname can not be resolved");
+		    
+		}
+		return hostname;
 	}
 
 }
