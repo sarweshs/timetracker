@@ -1,6 +1,8 @@
 package com.ibm.timetracker.model;
 
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class IpAddress  implements Serializable{
 
@@ -49,6 +51,28 @@ public class IpAddress  implements Serializable{
 		this.parentMac = parentMac;
 	}
 	
-	
+	protected double getHours()
+	{
+		if(getEndTime() == null || getStartTime() == null)
+		{
+			return 0;
+		}
+		Calendar cal = Calendar.getInstance();
+		String[] endTime = getEndTime().split(":");
+		cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(endTime[0]));
+		cal.set(Calendar.MINUTE, Integer.parseInt(endTime[1]));
+		long end = cal.getTimeInMillis();
+		
+		String[] startTime = getStartTime().split(":");
+		cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime[0]));
+		cal.set(Calendar.MINUTE, Integer.parseInt(startTime[1]));
+		long start = cal.getTimeInMillis();
+		
+		long diff = end - start;
+		long hours = TimeUnit.MILLISECONDS.toHours(diff);
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(diff - (hours * 60 * 60 * 1000));
+		double minuteD = (double)minutes/60;
+		return hours + minuteD;
+	}
 
 }

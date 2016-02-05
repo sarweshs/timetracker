@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ibm.timetracker.util.DecimalFormatUtil;
 
 public class ComputerConfig implements Serializable{
 	
@@ -20,7 +20,7 @@ public class ComputerConfig implements Serializable{
 	private String currentDate;
 	
 	private List<MacAddress>listMacs;
-
+	
 	public int getComputerId() {
 		return computerId;
 	}
@@ -84,5 +84,19 @@ public class ComputerConfig implements Serializable{
 		}
 		return null;
 	}
+
+	public String getTotalTime() {
+		double totalTime = 0;
+		for(MacAddress mac:getListMacs())
+		{
+			for(IpAddress ip:mac.getAllIpAddress())
+			{
+				totalTime = totalTime + ip.getHours();
+			}
+		}
+		return DecimalFormatUtil.getFormattedData(totalTime);
+	}
+	
+	
 	
 }
