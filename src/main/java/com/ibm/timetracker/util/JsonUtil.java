@@ -17,10 +17,16 @@ public class JsonUtil {
 	public static void main(String[] args) {
 		//Jackson2Example obj = new Jackson2Example();
 		//obj.run();
-		ComputerConfig comp = createDummyObject();
+		/*ComputerConfig comp = createDummyObject();
 		createJSON(comp, null);
 		
 		comp = (ComputerConfig)getObjectFromJson("c:/tmp/comp.json");
+		System.out.println(comp);*/
+		
+		ComputerConfig comp = createDummyObject();
+		createEncryptedJSON(comp, null);
+		
+		comp = (ComputerConfig)getObjectFromEncryptedJson(null);
 		System.out.println(comp);
 	}
 
@@ -50,6 +56,41 @@ public class JsonUtil {
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void createEncryptedJSON(Object comp,String path) {
+		ObjectMapper mapper = new ObjectMapper();
+		if(path == null)
+		{
+			path = "c:\\tmp\\encryptedcomp.json";
+		}
+		//mapper.
+		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+
+		try {
+			// Convert object to JSON string and save into a file directly
+			//mapper.writeValue(new File(path), comp);
+
+			// Convert object to JSON string
+			String jsonInString = mapper.writeValueAsString(comp);
+			jsonInString = EncryptionDecryptionUtil.encrypt(jsonInString, null);
+			FileUtility.writeToFile(path, jsonInString);
+			//System.out.println(jsonInString);
+
+			// Convert object to JSON string and pretty print
+			//jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(comp);
+			//System.out.println(jsonInString);
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -110,6 +151,50 @@ public class JsonUtil {
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return comp;
+	}
+	
+	public static Object getObjectFromEncryptedJson(String jsonFile) {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+		ComputerConfig comp = null;
+		if(jsonFile == null)
+		{
+			jsonFile = "c:\\tmp\\encryptedcomp.json";
+		}
+		try {
+
+			// Convert JSON string from file to Object
+			//comp = mapper.readValue(new File(jsonFile), ComputerConfig.class);
+			//System.out.println(comp);
+
+			// Convert JSON string to Object
+			//String jsonInString = "{\"name\":\"mkyong\",\"salary\":7500,\"skills\":[\"java\",\"python\"]}";
+			/*StringBuffer jsonInStringBuf = new StringBuffer();
+			for(String str:CsvReader.getAllLines(jsonFile))
+			{
+				jsonInStringBuf.append(str);
+			}
+			String jsonInString = jsonInStringBuf.toString();	*/	
+			String jsonInString = FileUtility.readFromFile(jsonFile);
+			jsonInString = EncryptionDecryptionUtil.decrypt(jsonInString, null);
+			comp = mapper.readValue(jsonInString, ComputerConfig.class);
+			System.out.println(comp);
+
+			//Pretty print
+			//String prettyStaff1 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(staff1);
+			//System.out.println(prettyStaff1);
+			
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return comp;
