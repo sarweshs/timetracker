@@ -38,7 +38,7 @@ public class CsvReader {
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(diff - (hours * 60 * 60 * 1000));
 		System.out.println(minutes);
 		double minuteD = (double)minutes/60;
-		System.out.println("Hours:" + (hours + minuteD));
+		System.out.println("Hours:" + DecimalFormatUtil.getFormattedData(hours + minuteD));
 	}
 	
 	public static String getLastLineFromCsv(String fileName)

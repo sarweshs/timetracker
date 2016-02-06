@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.timetracker.model.ComputerConfig;
-import com.ibm.timetracker.model.IpAddress;
-import com.ibm.timetracker.model.MacAddress;
+import com.ibm.timetracker.model.v2.ComputerConfigV2;
+import com.ibm.timetracker.model.v2.MacAndIpV2;
 
 public class JsonUtil {
 	
@@ -23,15 +23,16 @@ public class JsonUtil {
 		comp = (ComputerConfig)getObjectFromJson("c:/tmp/comp.json");
 		System.out.println(comp);*/
 		
-		ComputerConfig comp = createDummyObject();
+		ComputerConfigV2 comp = createDummyObject();
 		createEncryptedJSON(comp, null);
 		
-		comp = (ComputerConfig)getObjectFromEncryptedJson(null);
+		comp = (ComputerConfigV2)getObjectFromEncryptedJson(null);
 		System.out.println(comp);
 	}
 
-	public static void createJSON(Object comp,String path) {
+	public static String createJSON(Object comp,String path) {
 		ObjectMapper mapper = new ObjectMapper();
+		String jsonInString = null;
 		if(path == null)
 		{
 			path = "c:\\tmp\\comp.json";
@@ -44,12 +45,13 @@ public class JsonUtil {
 			mapper.writeValue(new File(path), comp);
 
 			// Convert object to JSON string
-			String jsonInString = mapper.writeValueAsString(comp);
+			jsonInString = mapper.writeValueAsString(comp);
 			System.out.println(jsonInString);
 
 			// Convert object to JSON string and pretty print
 			jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(comp);
 			System.out.println(jsonInString);
+			
 
 		} catch (JsonGenerationException e) {
 			e.printStackTrace();
@@ -58,10 +60,12 @@ public class JsonUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return jsonInString;
 	}
 	
-	public static void createEncryptedJSON(Object comp,String path) {
+	public static String createEncryptedJSON(Object comp,String path) {
 		ObjectMapper mapper = new ObjectMapper();
+		String jsonInString = null;
 		if(path == null)
 		{
 			path = "c:\\tmp\\encryptedcomp.json";
@@ -74,9 +78,9 @@ public class JsonUtil {
 			//mapper.writeValue(new File(path), comp);
 
 			// Convert object to JSON string
-			String jsonInString = mapper.writeValueAsString(comp);
-			jsonInString = EncryptionDecryptionUtil.encrypt(jsonInString, null);
-			FileUtility.writeToFile(path, jsonInString);
+			jsonInString = mapper.writeValueAsString(comp);
+			String encryptedJsonInString = EncryptionDecryptionUtil.encrypt(jsonInString, null);
+			FileUtility.writeToFile(path, encryptedJsonInString);
 			//System.out.println(jsonInString);
 
 			// Convert object to JSON string and pretty print
@@ -93,23 +97,20 @@ public class JsonUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return jsonInString;
 	}
 
-	private static ComputerConfig createDummyObject() {
+	private static ComputerConfigV2 createDummyObject() {
 
-		ComputerConfig comp = new ComputerConfig();
+		ComputerConfigV2 comp = new ComputerConfigV2();
 
-		comp.setComputerId(1);
 		comp.setComputerName("ssaurabh");
 		
-		MacAddress macIP = new MacAddress();
+		MacAndIpV2 macIP = new MacAndIpV2();
 		macIP.setComputerName(comp.getComputerName());
 		macIP.setMacAddress("a-b-c-d");
 		
-		IpAddress ip = new IpAddress();
-		ip.setIpAddress("192.168.1.3");
-		ip.setParentMac(macIP.getMacAddress());
-		macIP.addIpAddress(ip, false);
+		
 		//comp.getListMacs().add(macIP);
 		comp.addMacAddress(macIP, false);
 
@@ -120,7 +121,7 @@ public class JsonUtil {
 	public static Object getObjectFromJson(String jsonFile) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-		ComputerConfig comp = null;
+		ComputerConfigV2 comp = null;
 		if(jsonFile == null)
 		{
 			jsonFile = "c:\\tmp\\comp.json";
@@ -128,7 +129,7 @@ public class JsonUtil {
 		try {
 
 			// Convert JSON string from file to Object
-			comp = mapper.readValue(new File(jsonFile), ComputerConfig.class);
+			comp = mapper.readValue(new File(jsonFile), ComputerConfigV2.class);
 			System.out.println(comp);
 
 			// Convert JSON string to Object
@@ -139,7 +140,7 @@ public class JsonUtil {
 				jsonInStringBuf.append(str);
 			}
 			String jsonInString = jsonInStringBuf.toString();		
-			ComputerConfig staff1 = mapper.readValue(jsonInString, ComputerConfig.class);
+			ComputerConfigV2 staff1 = mapper.readValue(jsonInString, ComputerConfigV2.class);
 			System.out.println(staff1);
 
 			//Pretty print
