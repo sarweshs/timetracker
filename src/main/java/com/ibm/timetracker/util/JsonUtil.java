@@ -160,7 +160,7 @@ public class JsonUtil {
 	public static Object getObjectFromEncryptedJson(String jsonFile) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-		ComputerConfig comp = null;
+		ComputerConfigV2 comp = null;
 		if(jsonFile == null)
 		{
 			jsonFile = "c:\\tmp\\encryptedcomp.json";
@@ -181,7 +181,7 @@ public class JsonUtil {
 			String jsonInString = jsonInStringBuf.toString();	*/	
 			String jsonInString = FileUtility.readFromFile(jsonFile);
 			jsonInString = EncryptionDecryptionUtil.decrypt(jsonInString, null);
-			comp = mapper.readValue(jsonInString, ComputerConfig.class);
+			comp = mapper.readValue(jsonInString, ComputerConfigV2.class);
 			System.out.println(comp);
 
 			//Pretty print

@@ -213,7 +213,7 @@ class MyTimerTaskV2 extends TimerTask {
 
 public class SimpleTimerTaskV2 {
 	private static final String computerName;
-	public static final ComputerConfigV2 compConfig;
+	public static ComputerConfigV2 compConfig;
 	private static final String jsonPath;
 	public static final int uploadFrequency;
 	public static final String encryptJson;
@@ -228,15 +228,27 @@ public class SimpleTimerTaskV2 {
 		{
 			filePath = "encrypted_" + filePath;
 		}
-		if(new File(filePath).exists())
+		try{
+			if(new File(filePath).exists())
+			{
+				if(encryptJson.equalsIgnoreCase("true"))
+				{
+					compConfig = (ComputerConfigV2)JsonUtil.getObjectFromEncryptedJson(filePath);
+				}else
+				{
+					compConfig = (ComputerConfigV2)JsonUtil.getObjectFromJson(filePath);
+				}
+			}
+			else
+			{
+				compConfig = new ComputerConfigV2();
+				compConfig.setComputerName(computerName);
+				compConfig.setCurrentDate(formattedDate);
+			}
+		}catch(Exception ex)
 		{
-			compConfig = (ComputerConfigV2)JsonUtil.getObjectFromJson(filePath);
-		}
-		else
-		{
-			compConfig = new ComputerConfigV2();
-			compConfig.setComputerName(computerName);
-			compConfig.setCurrentDate(formattedDate);
+			ex.printStackTrace();
+			System.exit(-1);
 		}
 		String uploadFreq = PropertiesFileUtil.getProperty("json.upload.frequency");
 		if(uploadFreq == null)

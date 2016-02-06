@@ -8,17 +8,33 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class EncryptionDecryptionUtil {
+	private static final String secretKeyStr;
 	static Cipher cipher;
 	static SecretKey mySecretKey;
 	static
 	{
+		secretKeyStr = PropertiesFileUtil.getProperty("http.upload.password");
 		KeyGenerator keyGenerator;
 		try {
-			keyGenerator = KeyGenerator.getInstance("AES");
-			keyGenerator.init(128);
-			mySecretKey = keyGenerator.generateKey();
+			if(secretKeyStr != null)
+			{
+				// decode the base64 encoded string
+				byte[] decodedKey = Base64.getDecoder().decode(secretKeyStr);
+				// rebuild key using SecretKeySpec
+				mySecretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
+			}
+			else
+			{
+				keyGenerator = KeyGenerator.getInstance("AES");
+				keyGenerator.init(128);
+				mySecretKey = keyGenerator.generateKey();
+				// get base64 encoded version of the key
+				String encodedKey = Base64.getEncoder().encodeToString(mySecretKey.getEncoded());
+				System.out.println(encodedKey);
+			}
 			cipher = Cipher.getInstance("AES");
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
